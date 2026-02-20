@@ -10,7 +10,7 @@ import os
 
 from src.maze import Maze
 from src.search_algos import *
-from src.evaluation import save_evaluation_plots, save_benchmark_trends # 引入新函数
+from src.evaluation import save_evaluation_plots, save_benchmark_trends, save_order_trends
 
 ALGO_COLORS = {
     "BFS": "#0000FF",            
@@ -108,7 +108,8 @@ class MazeApp:
             self.tree.column(col, width=60)
         self.tree.pack(fill="both", expand=True)
 
-        ttk.Button(sidebar, text="Run Full Benchmark (10-100) 📊", command=self.run_benchmark).pack(fill="x", side="bottom")
+        ttk.Button(sidebar, text="Run Full Benchmark (10-100) ", command=self.run_benchmark).pack(fill="x", side="bottom")
+        ttk.Button(sidebar, text="Run Order Benchmark (50x50) ", command=self.run_order_benchmark).pack(fill="x", side="bottom", pady=2)
 
         # Display
         right_frame = ttk.Frame(main_pane)
@@ -338,6 +339,89 @@ class MazeApp:
             save_benchmark_trends(results)
             
             messagebox.showinfo("Success", f"Benchmark Done!\n\nCSV saved to: {csv_path}\nTrend Plots saved to: Evaluate/ folder")
+            
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+        finally:
+            self.run_btn.config(text="RUN RACE ➤", state="normal")
+    def run_order_benchmark(self):
+        # 1. 从 UI 读取当前的迷宫设置
+        try:
+            r = int(self.rows_var.get())
+            c = int(self.cols_var.get())
+            m_type = self.maze_type.get()
+            sx, sy = int(self.start_x_var.get()), int(self.start_y_var.get())
+            ex, ey = int(self.end_x_var.get()), int(self.end_y_var.get())
+        except ValueError:
+            messagebox.showerror("Error", "Please ensure maze size and coordinates are valid numbers.")
+            return
+
+        msg = f"Run Search Order Benchmark?\n\nScope: Fixed {r}x{c} {m_type} Maze\nAlgorithms: ALL 6\nOrders: NWSE, NESW, SWNE, SENW\n\nThis will evaluate how direction priority impacts performance based on your current UI settings."
+        if not messagebox.askyesno("Confirm", msg): return
+        
+        self.run_btn.config(text="Benchmarking Orders...", state="disabled")
+        self.root.update()
+        
+        results = []
+        all_algos = [
+            ("BFS", solve_bfs),
+            ("DFS", solve_dfs),
+            ("A* (Manhattan)", solve_astar_manhattan),
+            ("A* (Euclidean)", solve_astar_euclidean),
+            ("MDP (Value Iter.)", solve_mdp_value),
+            ("MDP (Policy Iter.)", solve_mdp_policy)
+        ]
+        orders = ["NWSE", "NESW", "SWNE", "SENW"]
+        
+        try:
+            # 2. 根据 UI 参数生成一个固定的基准迷宫
+            m = Maze(r, c)
+            if m_type == "Imperfect": 
+                m.add_loops(6.0)
+            elif m_type == "Dungeon":
+                total = r * c
+                m.add_rooms(max(3, total//200), 3, min(r,c)//4)
+                m.add_loops(3.0)
+                
+            # 设置起点和终点
+            m.set_start_pos(sy, sx)
+            m.set_end_pos(ey, ex)
+            
+            # 3. 遍历四种顺序
+            for order in orders:
+                print(f"Benchmarking Order {order} on {r}x{c} {m_type} maze...")
+                
+                for name, func in all_algos:
+                    t1 = time.perf_counter()
+                    v, p = func(m, order=order)
+                    t2 = time.perf_counter()
+                    
+                    results.append({
+                        "Size_Rows": r,
+                        "Size_Cols": c,
+                        "Type": m_type,
+                        "Order": order,
+                        "Algorithm": name,
+                        "Time_ms": round((t2-t1)*1000, 4),
+                        "Nodes_Expanded": len(v),
+                        "Path_Length": len(p),
+                        "Success": len(p) > 0
+                    })
+            
+            # 保存 CSV
+            if not os.path.exists("data"): os.makedirs("data")
+            ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            csv_path = f"data/order_bench_{ts}.csv"
+            with open(csv_path, 'w', newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=results[0].keys())
+                writer.writeheader()
+                writer.writerows(results)
+                
+            # 4. 准备动态文本并生成图表
+            context_string = f"Type: {m_type} | Size: {r}x{c}"
+            save_order_trends(results, context_info=context_string)
+            
+            messagebox.showinfo("Success", f"Order Benchmark Done!\n\nCSV saved to: {csv_path}\nTrend Plots saved to: Evaluate/ folder")
             
         except Exception as e:
             messagebox.showerror("Error", str(e))

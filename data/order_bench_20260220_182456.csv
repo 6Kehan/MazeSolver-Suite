@@ -1,0 +1,25 @@
+Size,Order,Algorithm,Time_ms,Nodes_Expanded,Path_Length,Success
+50,NWSE,BFS,3.1444,1246,139,True
+50,NWSE,DFS,1.421,998,537,True
+50,NWSE,A* (Manhattan),1.4365,728,139,True
+50,NWSE,A* (Euclidean),1.8227,909,139,True
+50,NWSE,MDP (Value Iter.),285.2127,1311,139,True
+50,NWSE,MDP (Policy Iter.),361.5003,1311,139,True
+50,NESW,BFS,2.3582,1240,139,True
+50,NESW,DFS,2.38,1289,201,True
+50,NESW,A* (Manhattan),2.1393,728,139,True
+50,NESW,A* (Euclidean),2.8159,909,139,True
+50,NESW,MDP (Value Iter.),294.3625,1311,139,True
+50,NESW,MDP (Policy Iter.),365.0259,1311,139,True
+50,SWNE,BFS,1.5746,1246,139,True
+50,SWNE,DFS,1.1937,974,539,True
+50,SWNE,A* (Manhattan),1.3923,728,139,True
+50,SWNE,A* (Euclidean),1.8596,909,139,True
+50,SWNE,MDP (Value Iter.),282.0248,1311,140,True
+50,SWNE,MDP (Policy Iter.),363.6779,1311,139,True
+50,SENW,BFS,1.561,1252,139,True
+50,SENW,DFS,1.673,1207,283,True
+50,SENW,A* (Manhattan),1.3984,728,139,True
+50,SENW,A* (Euclidean),1.7985,909,139,True
+50,SENW,MDP (Value Iter.),282.2168,1311,143,True
+50,SENW,MDP (Policy Iter.),358.6771,1311,139,True

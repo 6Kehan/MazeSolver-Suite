@@ -102,3 +102,61 @@ def save_benchmark_trends(results, output_dir="Evaluate"):
         _plot_line('Path_Length', "Path Length vs Map Size", "Steps", "trend_steps")
     except Exception as e:
         print(f"Error plotting trends: {e}")
+
+
+    # 将这段代码粘贴到 evaluation.py 文件的最下方
+
+def save_order_trends(results, context_info, output_dir="Evaluate"):
+    """
+    【修改版】保存 方向顺序 (Order) 对比折线图。
+    动态接收 context_info 并展示在图注上。
+    """
+    if not results: return
+    if not os.path.exists(output_dir): os.makedirs(output_dir)
+    
+    plt.switch_backend('Agg')
+    ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    
+    orders = ["NWSE", "NESW", "SWNE", "SENW"]
+    algos = sorted(list(set(r['Algorithm'] for r in results)))
+    
+    COLOR_MAP = {
+        "BFS": "blue", "DFS": "red", 
+        "A* (Manhattan)": "green", "A* (Euclidean)": "magenta",
+        "MDP (Value Iter.)": "orange", "MDP (Policy Iter.)": "cyan"
+    }
+
+    def _plot_order_line(metric_key, title, ylabel, filename):
+        plt.figure(figsize=(10, 6))
+        
+        for algo in algos:
+            y_values = []
+            for order in orders:
+                matches = [r[metric_key] for r in results if r['Algorithm'] == algo and r['Order'] == order]
+                if matches:
+                    y_values.append(matches[0])
+                else:
+                    y_values.append(0)
+            
+            label_name = NAME_MAP.get(algo, algo)
+            col = COLOR_MAP.get(algo, 'black')
+            plt.plot(orders, y_values, marker='o', label=label_name, color=col, linewidth=2)
+
+        # 【核心修改】将动态的 context_info 放入图表标题中
+        plt.title(f"Order Impact Analysis: {title}\n({context_info})")
+        plt.xlabel("Search Order (Direction Priority)")
+        plt.ylabel(ylabel)
+        plt.grid(True, linestyle='--', alpha=0.7)
+        plt.legend()
+        
+        save_path = os.path.join(output_dir, f"order_bench_{ts}_{filename}.png")
+        plt.savefig(save_path)
+        plt.close()
+        print(f"Saved order plot: {save_path}")
+
+    try:
+        _plot_order_line('Time_ms', "Running Time", "Time (ms)", "time")
+        _plot_order_line('Nodes_Expanded', "Nodes Expanded", "Nodes Count", "nodes")
+        _plot_order_line('Path_Length', "Path Length", "Steps", "steps")
+    except Exception as e:
+        print(f"Error plotting order trends: {e}")
