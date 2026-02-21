@@ -142,8 +142,8 @@ def _solve_astar(maze, heuristic_func, order):
 # ==========================================
 
 # MDP 参数配置
-GAMMA = 0.95        # 折扣因子 (看重未来奖励)
-EPSILON = 1e-4      # 收敛阈值
+GAMMA = 0.99        # 折扣因子 (看重未来奖励)
+EPSILON = 1e-6      # 收敛阈值
 REWARD_GOAL = 100   # 终点奖励
 REWARD_STEP = -1    # 每步惩罚 (Living Penalty)
 

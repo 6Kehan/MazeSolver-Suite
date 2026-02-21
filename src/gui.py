@@ -24,7 +24,7 @@ ALGO_COLORS = {
 class MazeApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Maze Solver Ultimate - Benchmark Edition")
+        self.root.title("Maze Solver")
         self.root.geometry("1400x900")
         
         self.rows_var = tk.StringVar(value="41")
@@ -108,8 +108,8 @@ class MazeApp:
             self.tree.column(col, width=60)
         self.tree.pack(fill="both", expand=True)
 
-        ttk.Button(sidebar, text="Run Full Benchmark (10-100) ", command=self.run_benchmark).pack(fill="x", side="bottom")
-        ttk.Button(sidebar, text="Run Order Benchmark (50x50) ", command=self.run_order_benchmark).pack(fill="x", side="bottom", pady=2)
+        ttk.Button(sidebar, text="Run Maze Size Test (10-100) ", command=self.run_benchmark).pack(fill="x", side="bottom")
+        ttk.Button(sidebar, text="Run Order Test", command=self.run_order_benchmark).pack(fill="x", side="bottom", pady=2)
 
         # Display
         right_frame = ttk.Frame(main_pane)
@@ -159,7 +159,7 @@ class MazeApp:
             m_type = self.maze_type.get()
             if m_type == "Imperfect": self.current_maze.add_loops(6.0)
             elif m_type == "Dungeon":
-                self.current_maze.add_rooms(max(3, total//200), 3, min(r,c)//4)
+                self.current_maze.add_rooms(max(3, total//200), 3, max(3, min(r,c)//4))
                 self.current_maze.add_loops(3.0)
             
             sx, sy = int(self.start_x_var.get()), int(self.start_y_var.get())
@@ -247,6 +247,7 @@ class MazeApp:
                             self.canvas.create_rectangle(x1, y1, x2, y2, fill="#FFFACD", outline="")
             self.root.after(10, step, i + self.skip_frames)
         step(0)
+    
 
     def animate_race_path(self, data):
         max_l = max(len(d["path"]) for d in data)
@@ -303,7 +304,7 @@ class MazeApp:
                     if current_type == "Imperfect": m.add_loops(6.0)
                     elif current_type == "Dungeon":
                         total = size*size
-                        m.add_rooms(max(3, total//200), 3, min(size,size)//4)
+                        m.add_rooms(max(3, total//200), 3, max(3, min(size,size)//4))
                         m.add_loops(3.0)
                         
                     m.set_start_pos(1, 1)
@@ -316,8 +317,10 @@ class MazeApp:
                         v, p = func(m, order=current_order)
                         t2 = time.perf_counter()
                         
+                        # 【核心修改 1】在记录的数据里加上 Type 字段，让输出的 CSV 更严谨
                         results.append({
                             "Size": size,
+                            "Type": current_type,  # 新增字段
                             "Trial": trial,
                             "Algorithm": name,
                             "Time_ms": round((t2-t1)*1000, 4),
@@ -329,14 +332,15 @@ class MazeApp:
             # 保存 CSV
             if not os.path.exists("data"): os.makedirs("data")
             ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            csv_path = f"data/bench_{ts}.csv"
+            # 【核心修改 2】把生成的 CSV 文件名也带上迷宫类型
+            csv_path = f"data/bench_{current_type}_{ts}.csv"
             with open(csv_path, 'w', newline='') as f:
                 writer = csv.DictWriter(f, fieldnames=results[0].keys())
                 writer.writeheader()
                 writer.writerows(results)
                 
-            # 【核心】调用折线图绘制
-            save_benchmark_trends(results)
+            # 【核心修改 3】调用折线图绘制时，把迷宫类型传过去！
+            save_benchmark_trends(results, maze_type=current_type)
             
             messagebox.showinfo("Success", f"Benchmark Done!\n\nCSV saved to: {csv_path}\nTrend Plots saved to: Evaluate/ folder")
             
@@ -380,7 +384,7 @@ class MazeApp:
                 m.add_loops(6.0)
             elif m_type == "Dungeon":
                 total = r * c
-                m.add_rooms(max(3, total//200), 3, min(r,c)//4)
+                m.add_rooms(max(3, total//200), 3, max(3, min(r,c)//4))
                 m.add_loops(3.0)
                 
             # 设置起点和终点

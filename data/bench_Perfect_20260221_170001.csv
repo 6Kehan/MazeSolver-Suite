@@ -1,0 +1,61 @@
+Size,Type,Trial,Algorithm,Time_ms,Nodes_Expanded,Path_Length,Success
+10,Perfect,0,BFS,0.089,24,21,True
+10,Perfect,0,DFS,0.1132,50,21,True
+10,Perfect,0,A* (Manhattan),0.0865,21,21,True
+10,Perfect,0,A* (Euclidean),0.0794,21,21,True
+10,Perfect,0,MDP (Value Iter.),2.4554,50,23,True
+10,Perfect,0,MDP (Policy Iter.),13.2775,50,21,True
+20,Perfect,0,BFS,0.262,185,133,True
+20,Perfect,0,DFS,0.2401,185,133,True
+20,Perfect,0,A* (Manhattan),0.3247,185,133,True
+20,Perfect,0,A* (Euclidean),0.342,185,133,True
+20,Perfect,0,MDP (Value Iter.),44.2265,200,133,True
+20,Perfect,0,MDP (Policy Iter.),84.1447,200,133,True
+30,Perfect,0,BFS,0.2548,182,135,True
+30,Perfect,0,DFS,0.5538,450,135,True
+30,Perfect,0,A* (Manhattan),0.3182,168,135,True
+30,Perfect,0,A* (Euclidean),0.3128,168,135,True
+30,Perfect,0,MDP (Value Iter.),107.7359,450,135,True
+30,Perfect,0,MDP (Policy Iter.),181.407,450,135,True
+40,Perfect,0,BFS,0.9559,751,459,True
+40,Perfect,0,DFS,0.8482,669,459,True
+40,Perfect,0,A* (Manhattan),1.3722,748,459,True
+40,Perfect,0,A* (Euclidean),1.4228,749,459,True
+40,Perfect,0,MDP (Value Iter.),581.8752,800,459,True
+40,Perfect,0,MDP (Policy Iter.),631.8544,800,459,True
+50,Perfect,0,BFS,0.7307,533,393,True
+50,Perfect,0,DFS,0.9144,731,393,True
+50,Perfect,0,A* (Manhattan),0.8696,486,393,True
+50,Perfect,0,A* (Euclidean),0.9839,487,393,True
+50,Perfect,0,MDP (Value Iter.),761.3555,1250,393,True
+50,Perfect,0,MDP (Policy Iter.),922.1155,1250,393,True
+60,Perfect,0,BFS,1.4211,1133,611,True
+60,Perfect,0,DFS,2.2417,1715,611,True
+60,Perfect,0,A* (Manhattan),1.9807,1062,611,True
+60,Perfect,0,A* (Euclidean),2.0021,1067,611,True
+60,Perfect,0,MDP (Value Iter.),1885.0617,1800,611,True
+60,Perfect,0,MDP (Policy Iter.),1802.1434,1800,611,True
+70,Perfect,0,BFS,1.0479,811,629,True
+70,Perfect,0,DFS,2.7216,2289,629,True
+70,Perfect,0,A* (Manhattan),1.4439,807,629,True
+70,Perfect,0,A* (Euclidean),1.56,807,629,True
+70,Perfect,0,MDP (Value Iter.),3441.535,2450,629,True
+70,Perfect,0,MDP (Policy Iter.),3161.28,2450,629,True
+80,Perfect,0,BFS,3.6819,2871,1113,True
+80,Perfect,0,DFS,3.9025,3029,1113,True
+80,Perfect,0,A* (Manhattan),5.4217,2636,1113,True
+80,Perfect,0,A* (Euclidean),5.3991,2648,1113,True
+80,Perfect,0,MDP (Value Iter.),5600.7445,3200,1113,True
+80,Perfect,0,MDP (Policy Iter.),5005.148,3200,1113,True
+90,Perfect,0,BFS,4.7744,3846,1817,True
+90,Perfect,0,DFS,3.9622,3174,1817,True
+90,Perfect,0,A* (Manhattan),7.0429,3772,1817,True
+90,Perfect,0,A* (Euclidean),7.6517,3785,1817,True
+90,Perfect,0,MDP (Value Iter.),11728.3627,4050,1818,True
+90,Perfect,0,MDP (Policy Iter.),9866.5809,4050,1817,True
+100,Perfect,0,BFS,5.4592,4075,2041,True
+100,Perfect,0,DFS,5.8107,4713,2041,True
+100,Perfect,0,A* (Manhattan),7.4314,3990,2041,True
+100,Perfect,0,A* (Euclidean),10.5098,3999,2041,True
+100,Perfect,0,MDP (Value Iter.),15040.5487,5000,3,True
+100,Perfect,0,MDP (Policy Iter.),12518.6507,5000,3,True

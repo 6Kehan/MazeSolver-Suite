@@ -42,10 +42,10 @@ def save_evaluation_plots(data, context_info, output_dir="Evaluate"):
         print(f"Bar charts saved to {output_dir}/")
     except Exception as e: print(f"Error plotting bars: {e}")
 
-def save_benchmark_trends(results, output_dir="Evaluate"):
+def save_benchmark_trends(results, maze_type="Unknown", output_dir="Evaluate"):
     """
-    【新增】保存 Benchmark 趋势折线图 (Line Chart)。
-    X轴: 迷宫大小, Y轴: 指标, 线条: 不同算法
+    保存 Benchmark 趋势折线图 (Line Chart)。
+    X轴: 迷宫大小, Y轴: 指标, 线条: 不同算法, 标题包含迷宫类型
     """
     if not results: return
     if not os.path.exists(output_dir): os.makedirs(output_dir)
@@ -54,7 +54,6 @@ def save_benchmark_trends(results, output_dir="Evaluate"):
     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     
     # 1. 数据整理
-    # 结构: data_map[algo_name] = {size: [val1, val2...]}
     sizes = sorted(list(set(r['Size'] for r in results)))
     algos = sorted(list(set(r['Algorithm'] for r in results)))
     
@@ -69,11 +68,9 @@ def save_benchmark_trends(results, output_dir="Evaluate"):
         plt.figure(figsize=(10, 6))
         
         for algo in algos:
-            # 提取该算法在不同尺寸下的平均值
             y_values = []
             x_values = []
             for size in sizes:
-                # 找到所有匹配 (Algo, Size) 的记录
                 matches = [r[metric_key] for r in results if r['Algorithm'] == algo and r['Size'] == size]
                 if matches:
                     avg_val = sum(matches) / len(matches)
@@ -85,13 +82,15 @@ def save_benchmark_trends(results, output_dir="Evaluate"):
                 col = COLOR_MAP.get(algo, 'black')
                 plt.plot(x_values, y_values, marker='o', label=label_name, color=col, linewidth=2)
 
-        plt.title(f"Scalability Analysis: {title}")
-        plt.xlabel("Maze Size (NxN)")
-        plt.ylabel(ylabel)
+        # 【核心修改 1】在标题中加入迷宫类型
+        plt.title(f"Scalability Analysis: {title}\n(Maze Type: {maze_type})", fontsize=14, fontweight='bold')
+        plt.xlabel("Maze Size (NxN)", fontsize=12)
+        plt.ylabel(ylabel, fontsize=12)
         plt.grid(True, linestyle='--', alpha=0.7)
         plt.legend()
         
-        save_path = os.path.join(output_dir, f"bench_{ts}_{filename}.png")
+        # 【核心修改 2】在保存的文件名中加入迷宫类型，防止不同测试的图片混淆
+        save_path = os.path.join(output_dir, f"bench_{maze_type}_{ts}_{filename}.png")
         plt.savefig(save_path)
         plt.close()
         print(f"Saved trend plot: {save_path}")
@@ -102,9 +101,6 @@ def save_benchmark_trends(results, output_dir="Evaluate"):
         _plot_line('Path_Length', "Path Length vs Map Size", "Steps", "trend_steps")
     except Exception as e:
         print(f"Error plotting trends: {e}")
-
-
-    # 将这段代码粘贴到 evaluation.py 文件的最下方
 
 def save_order_trends(results, context_info, output_dir="Evaluate"):
     """
