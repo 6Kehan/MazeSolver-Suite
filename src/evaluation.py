@@ -13,7 +13,7 @@ NAME_MAP = {
 }
 
 def save_evaluation_plots(data, context_info, output_dir="Evaluate"):
-    """保存单次赛跑的柱状对比图 (Bar Chart)"""
+    """保存单次赛跑的柱状对比图"""
     if not data: return
     if not os.path.exists(output_dir): os.makedirs(output_dir)
     
@@ -44,8 +44,7 @@ def save_evaluation_plots(data, context_info, output_dir="Evaluate"):
 
 def save_benchmark_trends(results, maze_type="Unknown", output_dir="Evaluate"):
     """
-    保存 Benchmark 趋势折线图 (Line Chart)。
-    X轴: 迷宫大小, Y轴: 指标, 线条: 不同算法, 标题包含迷宫类型
+    保存趋势折线图。
     """
     if not results: return
     if not os.path.exists(output_dir): os.makedirs(output_dir)
@@ -53,11 +52,11 @@ def save_benchmark_trends(results, maze_type="Unknown", output_dir="Evaluate"):
     plt.switch_backend('Agg')
     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     
-    # 1. 数据整理
+    # 数据整理
     sizes = sorted(list(set(r['Size'] for r in results)))
     algos = sorted(list(set(r['Algorithm'] for r in results)))
     
-    # 颜色映射 (保持和 GUI 一致)
+    # 颜色映射
     COLOR_MAP = {
         "BFS": "blue", "DFS": "red", 
         "A* (Manhattan)": "green", "A* (Euclidean)": "magenta",
@@ -82,14 +81,12 @@ def save_benchmark_trends(results, maze_type="Unknown", output_dir="Evaluate"):
                 col = COLOR_MAP.get(algo, 'black')
                 plt.plot(x_values, y_values, marker='o', label=label_name, color=col, linewidth=2)
 
-        # 【核心修改 1】在标题中加入迷宫类型
         plt.title(f"Scalability Analysis: {title}\n(Maze Type: {maze_type})", fontsize=14, fontweight='bold')
         plt.xlabel("Maze Size (NxN)", fontsize=12)
         plt.ylabel(ylabel, fontsize=12)
         plt.grid(True, linestyle='--', alpha=0.7)
         plt.legend()
         
-        # 【核心修改 2】在保存的文件名中加入迷宫类型，防止不同测试的图片混淆
         save_path = os.path.join(output_dir, f"bench_{maze_type}_{ts}_{filename}.png")
         plt.savefig(save_path)
         plt.close()
@@ -104,8 +101,7 @@ def save_benchmark_trends(results, maze_type="Unknown", output_dir="Evaluate"):
 
 def save_order_trends(results, context_info, output_dir="Evaluate"):
     """
-    【修改版】保存 方向顺序 (Order) 对比折线图。
-    动态接收 context_info 并展示在图注上。
+    保存方向顺序对比折线图。
     """
     if not results: return
     if not os.path.exists(output_dir): os.makedirs(output_dir)
@@ -138,7 +134,6 @@ def save_order_trends(results, context_info, output_dir="Evaluate"):
             col = COLOR_MAP.get(algo, 'black')
             plt.plot(orders, y_values, marker='o', label=label_name, color=col, linewidth=2)
 
-        # 【核心修改】将动态的 context_info 放入图表标题中
         plt.title(f"Order Impact Analysis: {title}\n({context_info})")
         plt.xlabel("Search Order (Direction Priority)")
         plt.ylabel(ylabel)

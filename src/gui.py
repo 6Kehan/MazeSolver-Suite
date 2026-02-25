@@ -58,7 +58,7 @@ class MazeApp:
         sidebar = ttk.Frame(main_pane, width=400, padding=10)
         main_pane.add(sidebar, minsize=400)
         
-        # 1. Maze Setup
+        # Maze Setup
         gen_group = ttk.LabelFrame(sidebar, text="1. Maze Setup", padding=10)
         gen_group.pack(fill="x", pady=5)
         
@@ -83,7 +83,7 @@ class MazeApp:
         ttk.Entry(f4, textvariable=self.end_x_var, width=4).pack(side="left")
         ttk.Entry(f4, textvariable=self.end_y_var, width=4).pack(side="left")
 
-        # 2. Algorithms
+        # Algorithms
         algo_group = ttk.LabelFrame(sidebar, text="2. Algorithms", padding=10)
         algo_group.pack(fill="x", pady=5)
         
@@ -99,7 +99,7 @@ class MazeApp:
         self.run_btn = tk.Button(algo_group, text="RUN RACE ➤", bg="#4CAF50", fg="white", font=("Arial", 12, "bold"), command=self.run_race)
         self.run_btn.pack(fill="x", pady=5)
 
-        # 3. Results
+        # Results
         res_group = ttk.LabelFrame(sidebar, text="3. Results", padding=10)
         res_group.pack(fill="both", expand=True, pady=5)
         self.tree = ttk.Treeview(res_group, columns=("A","T","N","S"), show="headings", height=8)
@@ -147,7 +147,9 @@ class MazeApp:
         h = self.path_px if r % 2 != 0 else self.wall_px
         cx, cy = x + w/2, y + h/2
         sw, sh = w * scale, h * scale
-        return cx - sw/2, cy - sh/2, cx + sw/2, cy + sh/2
+        #return cx - sw/2, cy - sh/2, cx + sw/2, cy + sh/2
+        return (round(cx - sw/2), round(cy - sh/2), 
+            round(cx + sw/2), round(cy + sh/2))
 
     def generate_maze(self):
         try:
@@ -250,29 +252,66 @@ class MazeApp:
     
 
     def animate_race_path(self, data):
+        """
+        使用连线来绘制路径。
+        """
         max_l = max(len(d["path"]) for d in data)
-        batch = 3 
+        batch = 2 
+        
         def step(i):
-            if i >= max_l: self.is_running = False; return
+            # 动画结束时的重绘
+            if i >= max_l: 
+                self.is_running = False
+                for d in data:
+                    path = d["path"]
+                    if len(path) < 2: continue
+                    # 线条宽度由原来的 scale 决定，确保依然可以叠加显示
+                    line_w = max(2, int(self.path_px * d["scale"]))
+                    for j in range(1, len(path)):
+                        prev_n, curr_n = path[j-1], path[j]
+                        # 提取两个格子的真实中心点
+                        x1, y1, x2, y2 = self.get_rect(prev_n[0], prev_n[1], scale=1.0)
+                        cx1, cy1 = (x1 + x2)/2, (y1 + y2)/2
+                        x1, y1, x2, y2 = self.get_rect(curr_n[0], curr_n[1], scale=1.0)
+                        cx2, cy2 = (x1 + x2)/2, (y1 + y2)/2
+                        self.canvas.create_line(cx1, cy1, cx2, cy2, fill=d["color"], width=line_w, capstyle=tk.ROUND)
+                return
+
+            # 逐帧绘制动画
             for b in range(batch):
                 curr = i + b
-                if curr < max_l:
+                # 从索引 1 开始，因为我们需要连线 当前点和上一个点
+                if 0 < curr < max_l:
                     for d in data:
                         if curr < len(d["path"]):
-                            n = d["path"][curr]
-                            if n != self.current_maze.start and n != self.current_maze.end:
-                                x1, y1, x2, y2 = self.get_rect(n[0], n[1], scale=d["scale"])
-                                self.canvas.create_rectangle(x1, y1, x2, y2, fill=d["color"], outline="")
+                            prev_n = d["path"][curr-1]
+                            curr_n = d["path"][curr]
+                            
+                            # 获取前一个节点的中心坐标
+                            x1_p, y1_p, x2_p, y2_p = self.get_rect(prev_n[0], prev_n[1], scale=1.0)
+                            cx1, cy1 = (x1_p + x2_p)/2, (y1_p + y2_p)/2
+                            
+                            # 获取当前节点的中心坐标
+                            x1_c, y1_c, x2_c, y2_c = self.get_rect(curr_n[0], curr_n[1], scale=1.0)
+                            cx2, cy2 = (x1_c + x2_c)/2, (y1_c + y2_c)/2
+                            
+                            # 线条宽度，大 scale 的算法线条粗，小 scale 的算法线条细
+                            line_w = max(2, int(self.path_px * d["scale"]))
+                            
+                            # 画线连接
+                            self.canvas.create_line(cx1, cy1, cx2, cy2, fill=d["color"], width=line_w, capstyle=tk.ROUND)
+
             self.root.after(10, step, i + batch)
+            
         step(0)
 
-    # === 【关键修改】Benchmark 逻辑 ===
+
     def run_benchmark(self):
         msg = "Run Full Benchmark?\n\nScope: Size 10x10 to 100x100\nAlgorithms: ALL 6\n\nNote: This will take a few minutes because MDP is slow on large maps."
         if not messagebox.askyesno("Confirm", msg): return
         
         self.run_btn.config(text="Benchmarking...", state="disabled")
-        self.root.update() # 强制刷新界面防止假死
+        self.root.update() # 强制刷新
         
         results = []
         
@@ -286,7 +325,7 @@ class MazeApp:
             ("MDP (Policy Iter.)", solve_mdp_policy)
         ]
         
-        # 定义测试尺寸：10, 20, ..., 100
+        # 定义测试尺寸
         sizes = list(range(10, 101, 10))
         
         current_order = self.search_order.get()
@@ -294,10 +333,8 @@ class MazeApp:
         
         try:
             for size in sizes:
-                # 每个尺寸跑 1 次 (为了节省时间，如果是严谨实验可以跑3次)
-                # 为了 Report 更好看，这里设置为 1 次即可演示趋势
                 for trial in range(1):
-                    # 生成临时迷宫 (不影响当前 GUI 显示)
+                    # 生成临时迷宫
                     m = Maze(size, size)
                     
                     # 应用迷宫类型设置
@@ -316,11 +353,10 @@ class MazeApp:
                         t1 = time.perf_counter()
                         v, p = func(m, order=current_order)
                         t2 = time.perf_counter()
-                        
-                        # 【核心修改 1】在记录的数据里加上 Type 字段，让输出的 CSV 更严谨
+
                         results.append({
                             "Size": size,
-                            "Type": current_type,  # 新增字段
+                            "Type": current_type, 
                             "Trial": trial,
                             "Algorithm": name,
                             "Time_ms": round((t2-t1)*1000, 4),
@@ -332,14 +368,14 @@ class MazeApp:
             # 保存 CSV
             if not os.path.exists("data"): os.makedirs("data")
             ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            # 【核心修改 2】把生成的 CSV 文件名也带上迷宫类型
+            # 把生成的 CSV 文件名也带上迷宫类型
             csv_path = f"data/bench_{current_type}_{ts}.csv"
             with open(csv_path, 'w', newline='') as f:
                 writer = csv.DictWriter(f, fieldnames=results[0].keys())
                 writer.writeheader()
                 writer.writerows(results)
                 
-            # 【核心修改 3】调用折线图绘制时，把迷宫类型传过去！
+            # 调用折线图绘制时，传迷宫类型
             save_benchmark_trends(results, maze_type=current_type)
             
             messagebox.showinfo("Success", f"Benchmark Done!\n\nCSV saved to: {csv_path}\nTrend Plots saved to: Evaluate/ folder")
@@ -349,7 +385,7 @@ class MazeApp:
         finally:
             self.run_btn.config(text="RUN RACE ➤", state="normal")
     def run_order_benchmark(self):
-        # 1. 从 UI 读取当前的迷宫设置
+        # 从 UI 读取当前的迷宫设置
         try:
             r = int(self.rows_var.get())
             c = int(self.cols_var.get())
@@ -378,7 +414,7 @@ class MazeApp:
         orders = ["NWSE", "NESW", "SWNE", "SENW"]
         
         try:
-            # 2. 根据 UI 参数生成一个固定的基准迷宫
+            # 根据 UI 参数生成一个固定的基准迷宫
             m = Maze(r, c)
             if m_type == "Imperfect": 
                 m.add_loops(6.0)
@@ -391,7 +427,7 @@ class MazeApp:
             m.set_start_pos(sy, sx)
             m.set_end_pos(ey, ex)
             
-            # 3. 遍历四种顺序
+            # 遍历四种顺序
             for order in orders:
                 print(f"Benchmarking Order {order} on {r}x{c} {m_type} maze...")
                 
@@ -421,7 +457,7 @@ class MazeApp:
                 writer.writeheader()
                 writer.writerows(results)
                 
-            # 4. 准备动态文本并生成图表
+            # 准备文本并生成图表
             context_string = f"Type: {m_type} | Size: {r}x{c}"
             save_order_trends(results, context_info=context_string)
             

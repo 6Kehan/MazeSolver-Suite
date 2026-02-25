@@ -1,0 +1,25 @@
+Size_Rows,Size_Cols,Type,Order,Algorithm,Time_ms,Nodes_Expanded,Path_Length,Success
+51,51,Dungeon,NWSE,BFS,2.2712,1538,105,True
+51,51,Dungeon,NWSE,DFS,2.2059,1034,643,True
+51,51,Dungeon,NWSE,A* (Manhattan),2.2395,1009,105,True
+51,51,Dungeon,NWSE,A* (Euclidean),2.8885,1289,105,True
+51,51,Dungeon,NWSE,MDP (Value Iter.),325.7643,1579,105,True
+51,51,Dungeon,NWSE,MDP (Policy Iter.),922.4872,1579,105,True
+51,51,Dungeon,NESW,BFS,2.0318,1532,105,True
+51,51,Dungeon,NESW,DFS,0.3632,253,211,True
+51,51,Dungeon,NESW,A* (Manhattan),3.0098,1009,105,True
+51,51,Dungeon,NESW,A* (Euclidean),2.8573,1289,105,True
+51,51,Dungeon,NESW,MDP (Value Iter.),324.6773,1579,105,True
+51,51,Dungeon,NESW,MDP (Policy Iter.),918.0066,1579,105,True
+51,51,Dungeon,SWNE,BFS,2.0345,1536,105,True
+51,51,Dungeon,SWNE,DFS,0.9188,688,453,True
+51,51,Dungeon,SWNE,A* (Manhattan),2.1019,1009,105,True
+51,51,Dungeon,SWNE,A* (Euclidean),2.8143,1289,105,True
+51,51,Dungeon,SWNE,MDP (Value Iter.),325.4312,1579,105,True
+51,51,Dungeon,SWNE,MDP (Policy Iter.),929.3854,1579,105,True
+51,51,Dungeon,SENW,BFS,2.1956,1536,105,True
+51,51,Dungeon,SENW,DFS,0.3987,267,241,True
+51,51,Dungeon,SENW,A* (Manhattan),2.2248,1009,105,True
+51,51,Dungeon,SENW,A* (Euclidean),2.9254,1289,105,True
+51,51,Dungeon,SENW,MDP (Value Iter.),327.2998,1579,105,True
+51,51,Dungeon,SENW,MDP (Policy Iter.),925.0623,1579,105,True

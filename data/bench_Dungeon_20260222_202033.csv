@@ -1,0 +1,61 @@
+Size,Type,Trial,Algorithm,Time_ms,Nodes_Expanded,Path_Length,Success
+10,Dungeon,0,BFS,0.304,31,15,True
+10,Dungeon,0,DFS,0.1362,39,25,True
+10,Dungeon,0,A* (Manhattan),0.114,18,15,True
+10,Dungeon,0,A* (Euclidean),0.125,18,15,True
+10,Dungeon,0,MDP (Value Iter.),2.6995,58,16,True
+10,Dungeon,0,MDP (Policy Iter.),13.5998,58,15,True
+20,Dungeon,0,BFS,0.5991,194,37,True
+20,Dungeon,0,DFS,0.3586,211,53,True
+20,Dungeon,0,A* (Manhattan),0.2406,111,37,True
+20,Dungeon,0,A* (Euclidean),0.2863,133,37,True
+20,Dungeon,0,MDP (Value Iter.),19.3983,237,37,True
+20,Dungeon,0,MDP (Policy Iter.),65.4586,237,37,True
+30,Dungeon,0,BFS,0.7534,500,63,True
+30,Dungeon,0,DFS,0.6658,489,89,True
+30,Dungeon,0,A* (Manhattan),0.4645,214,63,True
+30,Dungeon,0,A* (Euclidean),0.7321,332,63,True
+30,Dungeon,0,MDP (Value Iter.),51.7979,516,63,True
+30,Dungeon,0,MDP (Policy Iter.),175.6609,516,63,True
+40,Dungeon,0,BFS,1.3831,877,85,True
+40,Dungeon,0,DFS,0.3694,237,185,True
+40,Dungeon,0,A* (Manhattan),0.6946,316,85,True
+40,Dungeon,0,A* (Euclidean),1.0582,479,85,True
+40,Dungeon,0,MDP (Value Iter.),136.583,964,85,True
+40,Dungeon,0,MDP (Policy Iter.),366.4571,964,85,True
+50,Dungeon,0,BFS,2.1879,1551,95,True
+50,Dungeon,0,DFS,0.3914,263,255,True
+50,Dungeon,0,A* (Manhattan),1.5645,676,95,True
+50,Dungeon,0,A* (Euclidean),2.1709,969,95,True
+50,Dungeon,0,MDP (Value Iter.),277.2948,1618,97,True
+50,Dungeon,0,MDP (Policy Iter.),666.1839,1618,95,True
+60,Dungeon,0,BFS,3.5132,2254,171,True
+60,Dungeon,0,DFS,0.8919,612,439,True
+60,Dungeon,0,A* (Manhattan),2.1235,969,171,True
+60,Dungeon,0,A* (Euclidean),3.8178,1546,171,True
+60,Dungeon,0,MDP (Value Iter.),634.9724,2288,172,True
+60,Dungeon,0,MDP (Policy Iter.),1732.8856,2288,171,True
+70,Dungeon,0,BFS,4.5488,3226,145,True
+70,Dungeon,0,DFS,4.6464,3179,291,True
+70,Dungeon,0,A* (Manhattan),3.1457,1328,145,True
+70,Dungeon,0,A* (Euclidean),4.8581,2121,145,True
+70,Dungeon,0,MDP (Value Iter.),875.0934,3257,148,True
+70,Dungeon,0,MDP (Policy Iter.),1701.0116,3257,145,True
+80,Dungeon,0,BFS,12.4204,4702,173,True
+80,Dungeon,0,DFS,1.4764,439,413,True
+80,Dungeon,0,A* (Manhattan),9.5181,1963,173,True
+80,Dungeon,0,A* (Euclidean),14.3303,3709,173,True
+80,Dungeon,0,MDP (Value Iter.),1534.7683,4707,176,True
+80,Dungeon,0,MDP (Policy Iter.),2845.7667,4707,173,True
+90,Dungeon,0,BFS,8.7873,5931,177,True
+90,Dungeon,0,DFS,0.8891,525,455,True
+90,Dungeon,0,A* (Manhattan),7.6515,3407,177,True
+90,Dungeon,0,A* (Euclidean),11.6081,4926,177,True
+90,Dungeon,0,MDP (Value Iter.),1798.8983,5953,177,True
+90,Dungeon,0,MDP (Policy Iter.),3642.8853,5953,177,True
+100,Dungeon,0,BFS,17.1637,7859,233,True
+100,Dungeon,0,DFS,1.3485,551,507,True
+100,Dungeon,0,A* (Manhattan),15.7631,4472,233,True
+100,Dungeon,0,A* (Euclidean),24.396,6678,233,True
+100,Dungeon,0,MDP (Value Iter.),3336.7891,7872,234,True
+100,Dungeon,0,MDP (Policy Iter.),5840.0952,7872,233,True

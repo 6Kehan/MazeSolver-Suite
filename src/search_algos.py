@@ -3,14 +3,11 @@ import math
 import random
 from collections import deque
 
-# ==========================================
-# PART 1: Classical Search Algorithms
-# ==========================================
-
+# Search Algorithms
 def solve_bfs(maze, order="NWSE"):
     """
-    广度优先搜索 (BFS) - Queue (FIFO)
-    保证最短路径。
+    Breadth-First Search (BFS) - Queue (FIFO)
+    Guarantees the shortest path.
     """
     start = maze.start
     end = maze.end
@@ -18,7 +15,7 @@ def solve_bfs(maze, order="NWSE"):
     queue = deque([start])
     visited = {start}
     parent_map = {start: None}
-    visited_order = [] # 记录访问顺序用于动画
+    visited_order = [] # Record visit order for animation
     
     path = []
     found = False
@@ -31,7 +28,7 @@ def solve_bfs(maze, order="NWSE"):
             found = True
             break
         
-        # BFS 按照顺序将邻居加入队列
+        # BFS adds neighbors to queue in specified order
         for neighbor in maze.get_neighbors(current, order):
             if neighbor not in visited:
                 visited.add(neighbor)
@@ -44,8 +41,8 @@ def solve_bfs(maze, order="NWSE"):
 
 def solve_dfs(maze, order="NWSE"):
     """
-    深度优先搜索 (DFS) - Stack (LIFO)
-    不保证最短路径，路径通常很长且蜿蜒。
+    Depth-First Search (DFS) - Stack (LIFO)
+    Does not guarantee the shortest path.
     """
     start = maze.start
     end = maze.end
@@ -66,13 +63,13 @@ def solve_dfs(maze, order="NWSE"):
             found = True
             break
         
-        # 获取邻居
+        # Get neighbors
         neighbors = maze.get_neighbors(current, order)
         
-        # 【关键逻辑】Stack 是后进先出。
-        # 如果用户选 order="NWSE" (优先走北)，意味着我们希望 "北" 最先被 pop 出来。
-        # 为了让 "北" 在栈顶，我们需要把它最后压入栈。
-        # 所以我们将邻居列表反转，变成 [东, 南, 西, 北] 的顺序压入。
+        # Stack is Last-In-First-Out.
+        # If user selects order="NWSE", it means we want "North" to be popped first.
+        # To make "North" at the top of the stack, we need to push it last.
+        # So we reverse the neighbor list to push in [East, South, West, North] order.
         neighbors.reverse()
         
         for neighbor in neighbors:
@@ -86,25 +83,24 @@ def solve_dfs(maze, order="NWSE"):
     return visited_order, path
 
 def solve_astar_manhattan(maze, order="NWSE"):
-    """A* 搜索 - 曼哈顿距离 (适合网格)"""
+    """A* Search - Manhattan Distance"""
     return _solve_astar(maze, _heuristic_manhattan, order)
 
 def solve_astar_euclidean(maze, order="NWSE"):
-    """A* 搜索 - 欧几里得距离 (适合允许斜向移动的环境，这里作为对比)"""
+    """A* Search - Euclidean Distance"""
     return _solve_astar(maze, _heuristic_euclidean, order)
 
 def _solve_astar(maze, heuristic_func, order):
     start = maze.start
     end = maze.end
     
-    # Priority Queue: (f_score, tie_breaker_count, node)
     count = 0
     open_set = []
     heapq.heappush(open_set, (0, count, start))
     open_set_hash = {start}
     
     parent_map = {start: None}
-    g_score = {start: 0} # 从起点到当前的代价
+    g_score = {start: 0} # Cost from start to current node
     
     visited_order = []
     path = []
@@ -119,7 +115,7 @@ def _solve_astar(maze, heuristic_func, order):
             found = True
             break
         
-        # 获取邻居 (Order 在这里主要影响 f 值相同时的平局处理)
+        # Get neighbors and calculate g_score and f_score
         for neighbor in maze.get_neighbors(current, order):
             temp_g = g_score[current] + 1
             
@@ -137,22 +133,19 @@ def _solve_astar(maze, heuristic_func, order):
         path = _reconstruct_path(parent_map, end)
     return visited_order, path
 
-# ==========================================
-# PART 2: MDP Algorithms
-# ==========================================
-
-# MDP 参数配置
-GAMMA = 0.99        # 折扣因子 (看重未来奖励)
-EPSILON = 1e-6      # 收敛阈值
-REWARD_GOAL = 100   # 终点奖励
-REWARD_STEP = -1    # 每步惩罚 (Living Penalty)
+# MDP Algorithms
+# MDP parameter configuration
+GAMMA = 0.99        # Discount factor
+EPSILON = 1e-6      # Convergence threshold
+REWARD_GOAL = 100   # Goal reward
+REWARD_STEP = -1    # Step penalty
 
 def solve_mdp_value(maze, order="NWSE"):
-    """Value Iteration (值迭代)"""
+    """Value Iteration"""
     rows, cols = maze.height, maze.width
     end = maze.end
     
-    # 1. 初始化价值表 V(s) = 0
+    # Initialize value table V(s) = 0
     V = {}
     states = []
     for r in range(rows):
@@ -161,10 +154,10 @@ def solve_mdp_value(maze, order="NWSE"):
                 V[(r, c)] = 0
                 states.append((r, c))
     
-    # 终点价值初始化 (有助于加速收敛)
+    # Initialize end state value
     V[end] = REWARD_GOAL
 
-    # 2. 迭代直到收敛
+    # Iterate until convergence
     while True:
         delta = 0
         new_V = V.copy()
@@ -175,7 +168,7 @@ def solve_mdp_value(maze, order="NWSE"):
             neighbors = maze.get_neighbors(s, order)
             if not neighbors: continue
             
-            # Bellman Update: max( R + gamma * V(s') )
+            # Bellman Update
             max_val = -float('inf')
             for neighbor in neighbors:
                 reward = REWARD_GOAL if neighbor == end else REWARD_STEP
@@ -190,17 +183,17 @@ def solve_mdp_value(maze, order="NWSE"):
         if delta < EPSILON:
             break
 
-    # 3. 提取策略生成路径
+    # Extract policy to generate path
     path = _extract_path_from_values(maze, V, order)
     return states, path
 
 def solve_mdp_policy(maze, order="NWSE"):
-    """Policy Iteration (策略迭代)"""
+    """Policy Iteration"""
     rows, cols = maze.height, maze.width
     end = maze.end
     states = [ (r,c) for r in range(rows) for c in range(cols) if maze.grid[r][c] == 0 ]
 
-    # 1. 随机策略初始化
+    # Initialize with random policy
     policy = {} 
     V = {s: 0 for s in states}
     
@@ -210,10 +203,10 @@ def solve_mdp_policy(maze, order="NWSE"):
         if nbs: policy[s] = random.choice(nbs)
         else: policy[s] = s
 
-    # 2. 迭代
+    # Iteration
     is_stable = False
     while not is_stable:
-        # --- 策略评估 (Policy Evaluation) ---
+        # Policy Evaluation
         while True:
             delta = 0
             for s in states:
@@ -228,7 +221,7 @@ def solve_mdp_policy(maze, order="NWSE"):
                 V[s] = v_new
             if delta < EPSILON: break
         
-        # --- 策略改进 (Policy Improvement) ---
+        # Policy Improvement
         is_stable = True
         for s in states:
             if s == end: continue
@@ -237,7 +230,7 @@ def solve_mdp_policy(maze, order="NWSE"):
             best_action = None
             max_val = -float('inf')
             
-            # 使用 order 确保平局时的选择一致性
+            # Use order to ensure consistent choice in case of ties
             for n in maze.get_neighbors(s, order):
                 reward = REWARD_GOAL if n == end else REWARD_STEP
                 val = reward + GAMMA * V[n]
@@ -249,7 +242,7 @@ def solve_mdp_policy(maze, order="NWSE"):
             if old_action != best_action:
                 is_stable = False
 
-    # 3. 生成路径
+    # Generate path
     path = []
     curr = maze.start
     visited_set = set()
@@ -258,17 +251,17 @@ def solve_mdp_policy(maze, order="NWSE"):
         visited_set.add(curr)
         nxt = policy.get(curr)
         
-        # 防止死循环或无路可走
+        # Prevent infinite loop or no path available
         if not nxt or nxt in visited_set: break 
         curr = nxt
     
     path.append(end)
     return states, path
 
-# ================= Helper Functions =================
+# Helper Functions
 
 def _reconstruct_path(parent_map, current):
-    """从终点回溯到起点重构路径"""
+    """Reconstruct path from end to start by backtracking"""
     path = []
     while current:
         path.append(current)
@@ -277,7 +270,7 @@ def _reconstruct_path(parent_map, current):
     return path
 
 def _extract_path_from_values(maze, V, order):
-    """根据价值表 V 贪婪寻找路径"""
+    """Greedy path finding based on value table V"""
     path = []
     curr = maze.start
     end = maze.end
@@ -290,7 +283,7 @@ def _extract_path_from_values(maze, V, order):
         neighbors = maze.get_neighbors(curr, order)
         if not neighbors: break
         
-        # 找价值最高的邻居
+        # Find neighbor with highest value
         best_n = max(neighbors, key=lambda n: V.get(n, -float('inf')))
         
         if best_n in visited: break
