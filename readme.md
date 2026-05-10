@@ -15,9 +15,6 @@ Open your terminal, navigate to the project root directory, and run the main int
 ```bash
 python src/gui.py
 ```
-
-After running, the system will pop up the main Graphical User Interface (GUI) of the `Maze Solver`.
-
 ---
 
 ## 2. Core Features Guide
