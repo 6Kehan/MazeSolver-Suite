@@ -1,62 +1,88 @@
-# User Guide
+# MazeSolver-Suite
 
-### 1.1 Environment Requirements
+[![Demo Video](https://img.shields.io/badge/Video-Demo-red)](https://youtu.be/uy2UaO0K3jc)
 
-please ensure the following dependencies are installed:
+**MazeSolver-Suite** is an interactive maze pathfinding visualization and benchmarking platform. It integrates six search and planning algorithms with a GUI, real-time animation, and automated performance analysis tools.
+
+## Demo
+
+[![MazeSolver-Suite Demo](https://img.shields.io/badge/Watch-Demo%20Video-red)](https://youtu.be/uy2UaO0K3jc)
+
+Click the badge or [this link](https://youtu.be/uy2UaO0K3jc) to see a walkthrough of the system, including maze generation, algorithm race mode, and automated benchmarking.
+
+---
+
+## Features
+
+### Maze Generation
+Three maze types with increasing structural complexity:
+- **Perfect Maze** — Recursive backtracking algorithm. No loops, exactly one solution (tree structure).
+- **Imperfect Maze** — Built on a perfect maze by randomly removing walls to create loops and multiple solutions.
+- **Dungeon Maze** — Starts with randomly placed open rooms, then connects them with corridors. Highest complexity with large open areas and multiple paths.
+
+### Search & Planning Algorithms
+All six algorithms support configurable neighbor expansion priority orders (NWSE, NESW, SWNE, SENW):
+
+| Algorithm | Type | Optimality |
+|-----------|------|------------|
+| **BFS** | Uninformed search (FIFO queue) | Guarantees shortest path |
+| **DFS** | Uninformed search (LIFO stack) | Does not guarantee shortest path |
+| **A\* — Manhattan** | Informed search (priority queue) | Guarantees shortest path |
+| **A\* — Euclidean** | Informed search (priority queue) | Guarantees shortest path |
+| **MDP Value Iteration** | Dynamic programming (global policy) | Global optimum |
+| **MDP Policy Iteration** | Dynamic programming (policy evaluation + improvement) | Global optimum |
+
+### GUI Features
+- Adjustable maze size, type, start/end coordinates
+- Checkbox selection for any combination of algorithms
+- Dropdown menu for search direction priority
+- **Race Mode** — Run multiple algorithms simultaneously; results are visualized as colored concentric squares on the same canvas
+- Real-time animation of node expansion and final paths
+- Performance results table (time, expanded nodes, path length)
+
+### Automated Benchmarking
+
+**Run Order Test** — Executes all 6 algorithms under 4 direction orders (NWSE, NESW, SWNE, SENW) on the current maze, generating CSV data files and trend charts.
+
+**Run Maze Size Test** — Automatically scales maze size from 10×10 to 100×10 (step 10), runs all algorithms at each size, and produces comparison charts and CSV data.
+
+---
+
+## Environment Setup
 
 ```bash
 pip install pandas matplotlib
 ```
 
-### 1.2 Starting the Program
-
-Open your terminal, navigate to the project root directory, and run the main interface script:
+## Quick Start
 
 ```bash
 python src/gui.py
 ```
----
 
-## 2. Core Features Guide
+## Project Structure
 
-The left side of the interface is the control panel, and the right side is the visualization canvas for the maze and paths.
-
-### 1. Maze Setup
-
-Here you can customize the physical environment for generating the maze:
-
-* **Size**: Enter the width and height of the maze.
-* **Type**: Select your desired maze structure from the dropdown menu.
-* **Start / End**: Enter the starting and target coordinates for pathfinding.
-* **Generate**: Click this button, and the right canvas will immediately generate and render a brand new maze based on your parameters.
-
-### 2. Algorithms
-
-In this area, select the AI pathfinding algorithms and exploration rules you want to test:
-
-* **Priority**: Set the preferred direction order for expanding neighbor nodes via the dropdown menu.
-* **Algorithm Checkboxes**: You can check any number of algorithms (from 1 to 6) to run.
-* **Show Search**: When checked, the nodes expanded by the algorithm will be displayed in real-time as yellow squares during the animation (**Nodes Expanded**).
-
-### 3. Results
-
-* **RUN RACE**: Click the large green button, and the right canvas will dynamically demonstrate the pathfinding process of all checked algorithms. When multiple paths overlap, they will be displayed as colored concentric squares.
-* **Results**: After the animation finishes, the data table in the lower left corner will immediately update to show the core performance metrics of this run. Simultaneously, it will generate visualization charts for this run, located in the `Evaluate/` directory.
+```
+MazeSolver-Suite/
+├── src/
+│   ├── gui.py           # Tkinter user interface
+│   ├── maze.py           # Maze generator (3 types)
+│   ├── search_algos.py   # 6 algorithm implementations
+│   ├── evaluation.py     # Benchmarking & chart generation
+│   └── __init__.py
+├── data/                 # Generated CSV benchmark results
+├── Evaluate/             # Generated PNG evaluation charts
+└── readme.md
+```
 
 ---
 
-## 3. Automated Benchmarking and Visualization
+## Performance Insights
 
-The system provides two automated testing buttons at the very bottom of the interface. **Note: These two tests will dynamically read the "Maze Type" and "Start/End" settings currently generated on your canvas.**
+Extensive benchmarking (detailed in the [technical report](./CS7IS2_Assignment1_Report.pdf)) reveals:
 
-### Run Order Test
-
-* **Function**: Automatically run all 6 algorithms using 4 different search direction orders (NWSE, NESW, SWNE, SENW) under the current maze.
-* **Output**: After the run is complete, the system will automatically generate an `order_bench_[timestamp].csv` data file in the background, and automatically plot and save charts.
-
-### Run Maze Size Test (10-100)
-
-* **Function**: Automatically start from a `10x10` size and gradually increase to `100x100` with a step size of 10, running all 6 algorithms at each size.
-* **Output**: After the run finishes, the system will automatically generate `bench_[Maze Type]_[timestamp].csv` in the background, along with comparison charts and CSV data.
-
-**Data Storage Location**: All CSV data tables will be automatically saved in the `data/` folder under the project root directory, and PNG visualization charts will be automatically saved in the `Evaluate/` folder under the project root directory.
+- **A\*-Manhattan** offers the best overall balance of speed, optimality, and stability across all maze types.
+- **DFS** is the fastest when search direction aligns with the goal direction, but degrades dramatically under unfavorable direction orders — up to 60× difference in runtime.
+- **BFS** is the slowest search algorithm in deep mazes due to exhaustive nearest-node expansion, but reliably returns the shortest path.
+- **MDP algorithms** are significantly slower than search algorithms (global vs. goal-directed), but provide a complete policy for every cell in the maze.
+- Heuristic function choice matters: in a 100×100 Dungeon maze, A\*-Manhattan was nearly 2× faster than A\*-Euclidean due to better alignment with the 4-direction movement model.
